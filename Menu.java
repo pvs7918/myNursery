@@ -166,4 +166,137 @@ public class Menu {
     }
 
     // методы для обработки меню - Покупатели
-}
+    public void AnimalsShowTableAll() {
+        // Создаем объект Модель - она содержит коллекцию объектов нужного типа
+        // позволяет загружать, сохранять и вносить изменения в коллекцию
+        // показать таблицу Игрушки полностью
+        // загружаем данные в модель из файла
+        BuyersModel buyersModel = new BuyersModel();
+        if (buyersModel.load()) {
+            BuyersView buyersView = new BuyersView(buyersModel.getBuyersAll());
+            buyersView.ShowTable();
+        }
+        ReturnToPrevPos();
+        showBuyersMenu();
+    }
+
+    public boolean BuyerAddNew() {
+        // Добавление игрушки
+        // через параметр передаем сканер чтобы не создавать новый.
+        // И для консольного приложения рекомендуется использовать один сканер
+        // загружаем данные в модель из файла
+        BuyersModel buyersModel = new BuyersModel();
+        if (!buyersModel.load()) {
+            System.out.println("\nФункция добавления покупателя прервана.");
+            return false;
+        }
+
+        int curId = buyersModel.getNewId();
+        // Вводим значения полей
+        System.out.println("\nДобавление покупателя. Введите значения полей.");
+        System.out.print("ФИО: ");
+        try {
+            String curFullName = sc.nextLine();
+            System.out.print("Номер чека: ");
+            String curCheckNumber = sc.nextLine();
+            System.out.print("Номер телефона: ");
+            String curPhone = sc.nextLine();
+            Buyer curBuyer = new Buyer(curId, curFullName, curCheckNumber,
+                    curPhone);
+            buyersModel.add(curBuyer);
+        } catch (Exception ex) {
+            System.out.println("Ошибка при вводе данных о покупателе.\n" + ex.toString());
+            return false;
+        }
+
+        if (buyersModel.save()) {
+            System.out.println("Новый покупатель успешно добавлен!");
+        } else {
+            System.out.println("Ошибка при добавлении нового покупателя.");
+            return false;
+        }
+        return true;
+    }
+
+    public boolean BuyerDeleteById() {
+        // Удаление игрушки
+        // загружаем данные в модель из файла
+
+        // Показываем список игрушек для выбора id для удаления
+        BuyersModel buyersModel = new BuyersModel();
+        if (buyersModel.load()) {
+            BuyersView buyersView = new BuyersView(buyersModel.getBuyersAll());
+            buyersView.ShowTable();
+        }
+        System.out.print("\nВведите id удаляемого покупателя: ");
+        try {
+            int curId = Integer.parseInt(sc.nextLine());
+            // удаляем запись
+            if (buyersModel.deleteById(curId)) {
+                // сохраняем данные в файл
+                buyersModel.save();
+                return true;
+            }
+        } catch (Exception ex) {
+            System.out.println("Ошибка при удалении покупателя.\n" + ex.toString());
+            return false;
+        }
+        return false;
+    }
+
+    public boolean BuyerEdit() {
+        // Редактирование игрушки
+        Buyer editedBuyer;
+        // Показываем список игрушек для выбора id для редактирования
+        BuyersModel buyersModel = new BuyersModel();
+        if (buyersModel.load()) {
+            BuyersView buyersView = new BuyersView(buyersModel.getBuyersAll());
+            buyersView.ShowTable();
+        }
+        System.out.print("\nВведите id редактируемого покупателя: ");
+        try {
+            int curId = Integer.parseInt(sc.nextLine());
+            editedBuyer = buyersModel.getBuyerById(curId);
+            String curValue;
+            System.out.println("Введите новые значения полей (Enter - оставить прежнее значение).");
+            // Получаем новые значения полей
+            System.out.print("ФИО (прежнее значение): " +
+                    editedBuyer.getFullName() +
+                    "\nНовое значение: ");
+            curValue = sc.nextLine();
+            if (!curValue.equals(""))
+                editedBuyer.setFullName(curValue);
+
+            System.out.print("Номер чека (прежнее значение): " +
+                    editedBuyer.getCheckNumber() +
+                    "\nНовое значение: ");
+            curValue = sc.nextLine();
+            if (!curValue.equals(""))
+                editedBuyer.setCheckNumber(curValue);
+
+            System.out.print("Номер телефона (прежнее значение): " +
+                    editedBuyer.getPhone() +
+                    "\nНовое значение: ");
+            curValue = sc.nextLine();
+            if (!curValue.equals(""))
+                editedBuyer.setPhone(curValue);
+
+            // сохраняем данные в файл
+            if (buyersModel.save()) {
+                System.out.println("Данные покупателя с id=" + curId + " успешно отредактированы.");
+                return true;
+            }
+
+        } catch (Exception ex) {
+            System.out.println("Ошибка при редактировании данных покупателя.\n" + ex.toString());
+            return false;
+        }
+        return false;
+    }
+
+    // методы для обработки меню - Игрушки
+    public void ToysShowTableAll() {
+        // Создаем объект Модель - она содержит коллекцию объектов нужного типа
+        // позволяет загружать, сохранять и вносить изменения в коллекцию
+        // показать таблицу Игрушки полностью
+        // загружаем данные в модель из файла
